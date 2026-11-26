@@ -1,5 +1,5 @@
 # Ejercicio 3 — Flutter
 
-Proyecto para practicar Git avanzado y desarrollo móvil con Flutter.
+Actualización independiente de la guía por otro desarrollador en main.
 
 A new Flutter project.
