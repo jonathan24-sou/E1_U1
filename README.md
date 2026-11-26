@@ -1,6 +1,7 @@
 # Ejercicio 3 — Flutter
 
 Solución práctica de Git avanzado, persistencia local, consumo de API y almacenamiento seguro.
+La guía también conserva la actualización independiente que otro desarrollador hizo en `main`.
 
 ## Ejecutar
 
