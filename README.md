@@ -18,13 +18,14 @@ La app consulta el tipo de cambio MXN y presenta USD/EUR. La base local Floor se
 
 El historial tiene un commit inicial en `main` y dos commits de trabajo en `feature/login`. Después se simuló un cambio independiente en `main`, se produjo un conflicto de README y se integró `main` en la rama de trabajo con `git merge`, resolviendo el README para conservar ambas aportaciones.
 
-Para publicar el repositorio y abrir un PR cuando exista un remoto GitHub:
+Repositorio publicado: [jonathan24-sou/E1_U1](https://github.com/jonathan24-sou/E1_U1).
+Las ramas `main` y `feature/login` están subidas y el [PR #1](https://github.com/jonathan24-sou/E1_U1/pull/1) está abierto.
+
+Para volver a publicar las ramas:
 
 ```powershell
-git remote add origin https://github.com/<usuario>/<repositorio>.git
 git push -u origin main
 git push -u origin feature/login
-gh pr create --base main --head feature/login --title "Ejercicios 3.1–3.4" --body "Agrega notas locales, consulta de divisas y almacenamiento seguro."
 ```
 
 ## Ejercicio 3.2 — Base de datos local (Floor)
@@ -55,6 +56,11 @@ final String? savedJwt = await tokens.read();
 Dependencia para la API de AndroidX Security Crypto:
 
 ```kotlin
+import android.content.Context
+import androidx.security.crypto.EncryptedSharedPreferences
+import androidx.security.crypto.MasterKey
+
+// En build.gradle.kts
 implementation("androidx.security:security-crypto:1.1.0-alpha06")
 ```
 
@@ -91,12 +97,18 @@ enum KeychainToken {
         let query: [String: Any] = [
             kSecClass as String: kSecClassGenericPassword,
             kSecAttrService as String: service,
-            kSecAttrAccount as String: account,
-            kSecValueData as String: Data(token.utf8),
-            kSecAttrAccessible as String: kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly
+            kSecAttrAccount as String: account
         ]
-        let status = SecItemAdd(query as CFDictionary, nil)
-        guard status == errSecSuccess else {
+        let update = [kSecValueData as String: Data(token.utf8)]
+        let status = SecItemUpdate(query as CFDictionary, update as CFDictionary)
+        if status == errSecItemNotFound {
+            var insertQuery = query
+            insertQuery[kSecValueData as String] = Data(token.utf8)
+            let insertStatus = SecItemAdd(insertQuery as CFDictionary, nil)
+            guard insertStatus == errSecSuccess else {
+                throw NSError(domain: NSOSStatusErrorDomain, code: Int(insertStatus))
+            }
+        } else if status != errSecSuccess {
             throw NSError(domain: NSOSStatusErrorDomain, code: Int(status))
         }
     }
